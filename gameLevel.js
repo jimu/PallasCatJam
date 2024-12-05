@@ -32,8 +32,9 @@ function buildLevel()
     sky = new Sky;
 
     // create parallax layers
-    for (let i=3; i--;)
-        new ParallaxLayer(i);
+//    for (let i=3; i--;)
+//        new ParallaxLayer(i);
+    new ParallaxLayer2(0);
     
     // apply decoration to all level tiles
     const pos = vec2();

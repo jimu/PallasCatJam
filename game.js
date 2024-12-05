@@ -8,13 +8,21 @@
 
 'use strict';
 
-// show the LittleJS splash screen
-setShowSplashScreen(true);
+const TESTAPP = 0
 
 let spriteAtlas, score, deaths;
 
+const IMAGES = ['tiles2.png', 'tilesLevel.png', 'hd1.jpg'];
+const SIZE_HD = vec2(1920, 1024);
+const INDEX_HD1 = 2
+
+window.alpha = 1
+
 // enable touch gamepad on touch devices
 touchGamepadEnable = true;
+
+const pos = vec2;
+const size = vec2;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit()
@@ -25,16 +33,21 @@ function gameInit()
         // large tiles
         circle:  tile(0),
         crate:   tile(2),
-        player:  tile(3),
+        player:  tile(1, vec2(128)),
         enemy:   tile(5),
         coin:    tile(6),
 
         // small tiles
         gun:     tile(2,8),
         grenade: tile(3,8),
+
+        hd1:     tile(0, SIZE_HD, INDEX_HD1),
+
+        // background tiles
     };
     // setup level
     buildLevel();
+    //const hd1 = new EngineObject(pos(0), SIZE_HD, spriteAtlas['hd1']); // falls down. way pixelated
 
     // init game
     score = deaths = 0;
@@ -55,14 +68,14 @@ function gameUpdate()
         player.velocity = vec2(0,.1);
         sound_jump.play();
     }
-    
+
     // mouse wheel = zoom
     cameraScale = clamp(cameraScale*(1-mouseWheel/10), 1, 1e3);
-    
+
     // T = drop test crate
     if (keyWasPressed('KeyT'))
         new Crate(mousePos);
-    
+
     // E = drop enemy
     if (keyWasPressed('KeyE'))
         new Enemy(mousePos);
@@ -114,6 +127,15 @@ function gameRenderPost()
     drawText('Deaths: ' + deaths, overlayCanvas.width*3/4, 20);
 }
 
+
+// TESTAPP
+
+function noop() { }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
-engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, ['tiles.png', 'tilesLevel.png']);
+
+if (TESTAPP)
+  engineInit(noop, noop, noop, noop, noop, IMAGES);
+else
+  engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, IMAGES);

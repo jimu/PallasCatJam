@@ -253,3 +253,44 @@ class ParallaxLayer extends EngineObject
         mainContext.drawImage(this.canvas, pos.x, pos.y, scale.x, scale.y);
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+class ParallaxLayer2 extends EngineObject
+{
+    constructor(index) 
+    {
+        super();
+
+        const size = vec2(1024,512);
+        this.size = size;
+        this.index = index;
+        this.renderOrder = -3e3 + index;
+        this.canvas = document.createElement('canvas');
+        this.context = this.canvas.getContext('2d');
+        this.canvas.width = size.x;
+        this.canvas.height = size.y;
+        //this.context.drawImage(textureInfo.image, x, y, w, h, -.5, -.5, 1, 1);
+
+        //drawTile(vec2(0), size, tile(2), undefined, 0, false, undefined, false, true, this.context)
+        drawTile(vec2(0), size, tile(0, size, 2), undefined, 0, false, undefined, false, true, this.context)
+    }
+
+    render()
+    {
+        // position layer based on camera distance from center of level
+        const parallax = vec2(1e3,-100).scale(this.index**2);
+        const cameraDeltaFromCenter = cameraPos
+            .subtract(levelSize.scale(.5))
+            .divide(levelSize.divide(parallax));
+        const scale = this.size.scale(2+2*this.index);
+        const pos = mainCanvasSize.scale(.5)         // center screen
+           .add(vec2(-scale.x/2,-scale.y/2))         // center layer 
+           .add(cameraDeltaFromCenter.scale(-.5))    // apply parallax
+           .add(vec2(0,(this.index*.1)*this.size.y)); // separate layers
+        
+        // draw the parallax layer onto the main canvas
+        console.log(pos.x, pos.y) // -64 28
+        mainContext.drawImage(this.canvas, 10, 10);
+    }
+}
