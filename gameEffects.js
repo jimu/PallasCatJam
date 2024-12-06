@@ -258,39 +258,80 @@ class ParallaxLayer extends EngineObject
 
 class ParallaxLayer2 extends EngineObject
 {
-    constructor(index) 
+    constructor(index, w, h, textureIndex, offset, renderOrder) 
     {
         super();
 
-        const size = vec2(1024,512);
+        // const size = vec2(1024,512);  // renders as 512x256!
+        const size = vec2(w,h);  // renders as 512x256!
         this.size = size;
         this.index = index;
-        this.renderOrder = -3e3 + index;
+        this.renderOrder = renderOrder;
+        //this.renderOrder = /* renderOrder; */ -3e3 + index;
+        console.log(`${index}: ${renderOrder}, ${this.renderOrder}`);
         this.canvas = document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
         this.canvas.width = size.x;
         this.canvas.height = size.y;
+        this.offset = offset
         //this.context.drawImage(textureInfo.image, x, y, w, h, -.5, -.5, 1, 1);
 
         //drawTile(vec2(0), size, tile(2), undefined, 0, false, undefined, false, true, this.context)
-        drawTile(vec2(0), size, tile(0, size, 2), undefined, 0, false, undefined, false, true, this.context)
+        // draws the image centered at position
+
+        if (this.index > 8)
+          drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
+        else
+          drawTile(size.scale(0.5), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
+    }
+
+    drawSun() {
+        //mainContext.drawImage(this.canvas, mainCanvasSize.x/2, 100);
+        const no_mirror = false
+        const angle = 0; // rand();
+        drawCanvas2D(this.pos, this.size, angle, no_mirror, (context)=>
+        {
+            const x = this.pos.x + tileFixBleedScale;
+            const y = this.pos.y + tileFixBleedScale;
+            const w = this.size.x - 2*tileFixBleedScale;
+            const h = this.size.y - 2*tileFixBleedScale;
+            context.drawImage(this.canvas, x, y, w, h, -.5, -.5, 1, 1);
+            //context.drawImage(this.canvas, mainCanvasSize.x/2, 100);
+        }, true, mainContext);
     }
 
     render()
     {
         // position layer based on camera distance from center of level
-        const parallax = vec2(1e3,-100).scale(this.index**2);
+        // so index 0 scales to 0, so it doesn't move
+        const parallax = vec2(1000,-100).scale(this.index**2);
         const cameraDeltaFromCenter = cameraPos
             .subtract(levelSize.scale(.5))
             .divide(levelSize.divide(parallax));
+
         const scale = this.size.scale(2+2*this.index);
+
         const pos = mainCanvasSize.scale(.5)         // center screen
            .add(vec2(-scale.x/2,-scale.y/2))         // center layer 
            .add(cameraDeltaFromCenter.scale(-.5))    // apply parallax
-           .add(vec2(0,(this.index*.1)*this.size.y)); // separate layers
+           .add(vec2(0,(this.index*.1)*this.size.y))  // separate layers
         
         // draw the parallax layer onto the main canvas
-        console.log(pos.x, pos.y) // -64 28
-        mainContext.drawImage(this.canvas, 10, 10);
+        const pos2 = pos.add(this.offset)
+        if (this.index == 14)
+          console.log(`index: ${this.index}, pos: ${pos}, pos2: ${pos2}, cameraDeltaFromCenter: ${cameraDeltaFromCenter}`) // -64 28
+
+        // sun
+        if (this.index > 8) {
+          drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, false, true)
+          //drawTile(pos, size=vec2(1), tileInfo, color=new Color, angle=0, mirror, additiveColor=new Color(0,0,0,0), useWebGL=glEnable, screenSpace, context)
+          //drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
+          //mainContext.drawImage(this.canvas, mainCanvasSize.x/2, 100);
+        }
+        else if (this.index >= 0)
+          mainContext.drawImage(this.canvas, pos2.x, 0);
+        //console.log(pos.x, pos.y) // -64 28
+        //mainContext.drawImage(this.canvas, pos.x, pos.y, scale.x, scale.y);
     }
 }
+

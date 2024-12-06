@@ -34,7 +34,13 @@ function buildLevel()
     // create parallax layers
 //    for (let i=3; i--;)
 //        new ParallaxLayer(i);
-    new ParallaxLayer2(0);
+    //new ParallaxLayer2(1, 2143, 1080, 4, vec2(6170,4257));
+    new ParallaxLayer2(0, 1920,  977, 3, vec2(960,437),   -3000);     // sky
+    new ParallaxLayer2(9,  256,  256, 8, vec2(5652,3416), -2999);  // sun
+    new ParallaxLayer2(1, 2143, 1080, 4, vec2(3108,1507), -2998);  // mountains
+    new ParallaxLayer2(2, 2143, 1080, 5, vec2(4597,1507), -2007);
+    new ParallaxLayer2(3, 2143, 1080, 6, vec2(5652,3416), -2006);
+    new ParallaxLayer2(4, 2143, 1080, 7, vec2(6270,3416), -2005);
     
     // apply decoration to all level tiles
     const pos = vec2();
@@ -120,7 +126,7 @@ function loadLevel(level=0)
                 tileType = tileType_breakable;
             if (tile == tileLookup.ladder)
                 tileType = tileType_ladder;
-            if (tile == tileLookup.metal)
+            if (tile == tileLookup.metal || tile == 6 || tile == 6 || tile == 7 || tile == 8 || tile == 9)
                 tileType = tileType_solid;
             if (tileType)
             {

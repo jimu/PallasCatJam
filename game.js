@@ -9,10 +9,12 @@
 'use strict';
 
 const TESTAPP = 0
+const w = window
 
 let spriteAtlas, score, deaths;
 
-const IMAGES = ['tiles2.png', 'tilesLevel.png', 'hd1.jpg'];
+const IMAGES = ['tiles2.png', 'tilesLevel.png', 'hd1.jpg', 'bg1_sky.png', 'bg2_mountains.png', 'bg3_big_rocks.png', 'bg4_trees.png',
+  'bg5_short_rocks.png', 'sun.png', 'tiles3.png'];
 const SIZE_HD = vec2(1920, 1024);
 const INDEX_HD1 = 2
 
@@ -20,6 +22,7 @@ window.alpha = 1
 
 // enable touch gamepad on touch devices
 touchGamepadEnable = true;
+showWatermark = false;
 
 const pos = vec2;
 const size = vec2;
@@ -41,9 +44,11 @@ function gameInit()
         gun:     tile(2,8),
         grenade: tile(3,8),
 
-        hd1:     tile(0, SIZE_HD, INDEX_HD1),
+        //ham:     tile(3, vec2(64)),
+        ham:     tile(6, vec2(64)),
 
         // background tiles
+        hd1:     tile(0, SIZE_HD, INDEX_HD1),
     };
     // setup level
     buildLevel();
@@ -56,6 +61,11 @@ function gameInit()
     objectDefaultAngleDamping = .99;
     cameraScale = 4*16;
     cameraPos = getCameraTarget();
+
+    //new GameObject(vec2(0), vec2(64), spriteAtlas['ham']);
+    //w.ham = new GameObject(vec2(0), vec2(64/8), spriteAtlas['ham']);
+    //w.ham.gravityScale = 0
+    //w.ham.renderOrder = 1000;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,8 +133,16 @@ function gameRenderPost()
         overlayContext.strokeText(text, x, y);
         overlayContext.fillText(text, x, y);
     }
-    drawText('Score: ' + score,   overlayCanvas.width*1/4, 20);
-    drawText('Deaths: ' + deaths, overlayCanvas.width*3/4, 20);
+    drawText('Grumpiness: 2' ,   overlayCanvas.width*1/4, 20);
+    drawText('Snacks: ' , overlayCanvas.width*3/4, 20);
+
+    var x = overlayCanvas.width*3/4 + 110
+    const inc = 64
+    drawTile(vec2(x, 35), vec2(64), spriteAtlas['ham'], undefined, 0, false, undefined, false, true);
+    drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], undefined, 0, false, undefined, true, true);
+    drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], GRAY, 0, false, undefined, true, true);
+    drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], GRAY, 0, false, undefined, true, true);
+    drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], GRAY, 0, false, undefined, true, true);
 }
 
 
