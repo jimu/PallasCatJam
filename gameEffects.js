@@ -68,14 +68,6 @@ function explosion(pos, radius=3)
             destroyTile(pos.add(vec2(x,y)), 0, 0);
     }
 
-    // cleanup neighbors
-    const cleanupRadius = radius + 2;
-    for (let x = -cleanupRadius; x < cleanupRadius; ++x)
-    {
-        const h = (cleanupRadius**2 - x**2)**.5;
-        for (let y = -h; y < h; ++y)
-            decorateTile(pos.add(vec2(x,y)).floor());
-    }
 
     // kill/push objects
     engineObjectsCallback(pos, radius*3, (o)=> 
@@ -145,14 +137,6 @@ function destroyTile(pos, makeSound = 1, cleanNeighbors = 1)
     tileLayer.setData(pos, new TileLayerData, 1);
     setTileCollisionData(pos, tileType_empty);
     setTileData(pos, foregroundLayerIndex, 0);
-
-    // cleanup neighbors
-    if (cleanNeighbors)
-    {
-        for (let i=-1;i<=1;++i)
-        for (let j=-1;j<=1;++j)
-            decorateTile(pos.add(vec2(i,j)));
-    }
 
     return 1;
 }

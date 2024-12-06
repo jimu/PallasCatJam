@@ -32,9 +32,6 @@ function buildLevel()
     sky = new Sky;
 
     // create parallax layers
-//    for (let i=3; i--;)
-//        new ParallaxLayer(i);
-    //new ParallaxLayer2(1, 2143, 1080, 4, vec2(6170,4257));
     new ParallaxLayer2(0, 1920,  977, IMAGE_BG1, vec2(960,437),   -3000);  // sky
     new ParallaxLayer2(9,  256,  256, IMAGE_SUN, vec2(5652,3416), -2999);  // sun
     new ParallaxLayer2(1, 2143, 1080, IMAGE_BG2, vec2(3108,1507), -2998);  // mountains
