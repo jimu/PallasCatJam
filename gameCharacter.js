@@ -17,7 +17,6 @@ class Character extends GameObject
     { 
         super(pos, vec2(.6,.95), tile());
 
-        this.weapon = new Weapon(pos, this);
         this.lastPos = pos;
         this.groundTimer        = new Timer;
         this.jumpTimer          = new Timer;
@@ -26,8 +25,7 @@ class Character extends GameObject
         this.dodgeRechargeTimer = new Timer;
         this.deadTimer          = new Timer;
         this.grendeThrowTimer   = new Timer;
-        this.drawSize = vec2(1);
-        this.color = hsl(rand(),1,.7);
+        this.drawSize = vec2(1.5);
         this.renderOrder = 10;
         this.walkCyclePercent = 0;
         this.health = 1;
@@ -81,7 +79,7 @@ class Character extends GameObject
                 if (!this.groundObject && this.getAliveTime() > .2)
                     this.velocity.y += .2;
             }
-            if (this.pressingThrow && !this.wasPressingThrow && !this.grendeThrowTimer.active())
+            if (false && this.pressingThrow && !this.wasPressingThrow && !this.grendeThrowTimer.active())
             {
                 // throw greande
                 const grenade = new Grenade(this.pos);
@@ -218,17 +216,16 @@ class Character extends GameObject
         // update animation
         const animationFrame = this.isDead() ? 0 :
             this.climbingLadder || this.groundTimer.active() ?
-            2*this.walkCyclePercent|0 : 1;
+            2*this.walkCyclePercent|0 :
+            this.jumpTimer.get() % 0.3 > 0.15 ? 2 : 3;
+
         this.tileInfo = spriteAtlas.player.frame(animationFrame);
 
         let bodyPos = this.pos;
         if (!this.isDead())
         {
             // bounce pos with walk cycle
-            bodyPos = bodyPos.add(vec2(0,.05*Math.sin(this.walkCyclePercent*PI)));
-
-            // make bottom flush
-            bodyPos = bodyPos.add(vec2(0,(this.drawSize.y-this.size.y)/2));
+            bodyPos = bodyPos.add(vec2(0,.05*Math.sin(this.walkCyclePercent*PI) + 0.15));
         }
         drawTile(bodyPos, this.drawSize, this.tileInfo, this.color, this.angle, this.mirror);
     }

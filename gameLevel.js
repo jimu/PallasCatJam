@@ -32,12 +32,12 @@ function buildLevel()
     sky = new Sky;
 
     // create parallax layers
-    new ParallaxLayer2(0, 1920,  977, IMAGE_BG1, vec2(960,437),   -3000);  // sky
-    new ParallaxLayer2(9,  256,  256, IMAGE_SUN, vec2(5652,3416), -2999);  // sun
-    new ParallaxLayer2(1, 2143, 1080, IMAGE_BG2, vec2(3108,1507), -2998);  // mountains
-    new ParallaxLayer2(2, 2143, 1080, IMAGE_BG3, vec2(4597,1507), -2007);
-    new ParallaxLayer2(3, 2143, 1080, IMAGE_BG4, vec2(5652,3416), -2006);
-    new ParallaxLayer2(4, 2143, 1080, IMAGE_BG5, vec2(6270,3416), -2005);
+    new ParallaxLayer(0, 1920,  977, IMAGE_BG1, vec2(960,437),   -3000);  // sky
+    new ParallaxLayer(9,  256,  256, IMAGE_SUN, vec2(5652,3416), -2999);  // sun
+    new ParallaxLayer(1, 2143, 1080, IMAGE_BG2, vec2(3108,1507), -2998);  // mountains
+    new ParallaxLayer(2, 2143, 1080, IMAGE_BG3, vec2(4597,1507), -2007);
+    new ParallaxLayer(3, 2143, 1080, IMAGE_BG4, vec2(5652,3416), -2006);
+    new ParallaxLayer(4, 2143, 1080, IMAGE_BG5, vec2(6270,3416), 1000);
     
     // warm up level
     warmup = 1;

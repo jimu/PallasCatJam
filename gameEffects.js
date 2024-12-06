@@ -187,60 +187,8 @@ class Sky extends EngineObject
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// parallax background mountain ranges
 
 class ParallaxLayer extends EngineObject
-{
-    constructor(index) 
-    {
-        super();
-
-        const size = vec2(1024,512);
-        this.size = size;
-        this.index = index;
-        this.renderOrder = -3e3 + index;
-        this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
-        this.canvas.width = size.x;
-        this.canvas.height = size.y;
-
-        // create a gradient
-        const o1 = 40-20*index;
-        const o2 = 100-30*index;
-        const gradient = this.context.createLinearGradient(0,size.y/2-o1,0,size.y/2+o2);
-        const layerColor = levelColor.mutate(.1).lerp(sky.skyColor,1-index*.15);
-        gradient.addColorStop(0,layerColor);
-        gradient.addColorStop(1,layerColor.mutate(.5).scale(.1,1));
-        this.context.fillStyle = gradient;
-
-        // draw procedural mountains ranges
-        let groundLevel = size.y/2, groundSlope = rand(-1,1);
-        for (let i=size.x; i--;)
-            this.context.fillRect(i, groundLevel += groundSlope = rand() < .3 ? rand(1,-1) :
-                groundSlope + (size.y/2 - groundLevel)/300, 1, size.y);
-    }
-
-    render()
-    {
-        // position layer based on camera distance from center of level
-        const parallax = vec2(1e3,-100).scale(this.index**2);
-        const cameraDeltaFromCenter = cameraPos
-            .subtract(levelSize.scale(.5))
-            .divide(levelSize.divide(parallax));
-        const scale = this.size.scale(2+2*this.index);
-        const pos = mainCanvasSize.scale(.5)         // center screen
-           .add(vec2(-scale.x/2,-scale.y/2))         // center layer 
-           .add(cameraDeltaFromCenter.scale(-.5))    // apply parallax
-           .add(vec2(0,(this.index*.1)*this.size.y)); // separate layers
-        
-        // draw the parallax layer onto the main canvas
-        mainContext.drawImage(this.canvas, pos.x, pos.y, scale.x, scale.y);
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-class ParallaxLayer2 extends EngineObject
 {
     constructor(index, w, h, textureIndex, offset, renderOrder) 
     {
@@ -302,16 +250,18 @@ class ParallaxLayer2 extends EngineObject
         
         // draw the parallax layer onto the main canvas
         const pos2 = pos.add(this.offset)
-        if (this.index == 14)
+        if (this.index == 4)
           console.log(`index: ${this.index}, pos: ${pos}, pos2: ${pos2}, cameraDeltaFromCenter: ${cameraDeltaFromCenter}`) // -64 28
 
-        // sun
-        if (this.index > 8) {
+        if (this.index == 9) {  // sun
           drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, false, true)
           //drawTile(pos, size=vec2(1), tileInfo, color=new Color, angle=0, mirror, additiveColor=new Color(0,0,0,0), useWebGL=glEnable, screenSpace, context)
           //drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
           //mainContext.drawImage(this.canvas, mainCanvasSize.x/2, 100);
         }
+        else if (this.renderOrder == 1000)
+          //drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, true, true)
+          overlayContext.drawImage(this.canvas, pos2.x, 0);
         else if (this.index >= 0)
           mainContext.drawImage(this.canvas, pos2.x, 0);
         //console.log(pos.x, pos.y) // -64 28

@@ -52,28 +52,24 @@ function gameInit()
         crate:   tile(2),
         player:  tile(1, vec2(128)),
         enemy:   tile(5),
-        coin:    tile(6, vec2(64)),
+        coin:    tile(20, vec2(64)),
 
         // small tiles
         gun:     tile(2,8),
         grenade: tile(3,8),
 
         //ham:     tile(3, vec2(64)),
-        ham:     tile(6, vec2(64)),
-
-        // background tiles
-        hd1:     tile(0, SIZE_HD, INDEX_HD1),
+        ham:     tile(20, vec2(64)),
     };
     // setup level
     buildLevel();
-    //const hd1 = new EngineObject(pos(0), SIZE_HD, spriteAtlas['hd1']); // falls down. way pixelated
 
     // init game
     score = deaths = 0;
     gravity = -.01;
     objectDefaultDamping = .99;
     objectDefaultAngleDamping = .99;
-    cameraScale = 4*16;
+    cameraScale = 4*16 *1.20;
     cameraPos = getCameraTarget();
 
     //new GameObject(vec2(0), vec2(64), spriteAtlas['ham']);
