@@ -13,8 +13,22 @@ const w = window
 
 let spriteAtlas, score, deaths;
 
-const IMAGES = ['tiles2.png', 'tilesLevel.png', 'hd1.jpg', 'bg1_sky.png', 'bg2_mountains.png', 'bg3_big_rocks.png', 'bg4_trees.png',
-  'bg5_short_rocks.png', 'sun.png', 'tiles3.png'];
+const IMAGE_BG1 = 3
+const IMAGE_BG2 = 4
+const IMAGE_BG3 = 5
+const IMAGE_BG4 = 6
+const IMAGE_BG5 = 7
+const IMAGE_SUN = 8
+
+const IMAGES = [
+  'tiles2.png',
+  'tilesLevel.png',
+  'tilesLevel.png',
+  'bg1_sky.png',
+  'bg2_mountains.png',
+  'bg3_big_rocks.png',
+  'bg4_trees.png',
+  'bg5_short_rocks.png', 'sun.png'];
 const SIZE_HD = vec2(1920, 1024);
 const INDEX_HD1 = 2
 
@@ -38,7 +52,7 @@ function gameInit()
         crate:   tile(2),
         player:  tile(1, vec2(128)),
         enemy:   tile(5),
-        coin:    tile(6),
+        coin:    tile(6, vec2(64)),
 
         // small tiles
         gun:     tile(2,8),

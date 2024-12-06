@@ -96,14 +96,6 @@ class Coin extends EngineObject
         this.color = hsl(.15,1,.5);
     }
 
-    render()
-    {
-        // make it appear to spin
-        const t = time+this.pos.x/4+this.pos.y/4;
-        drawTile(this.pos, vec2(.1, .6), 0, this.color); // edge of coin
-        drawTile(this.pos, vec2(.5+.5*Math.sin(t*2*PI), 1), this.tileInfo, this.color);
-    }
-
     update(o)
     {
         if (!player)

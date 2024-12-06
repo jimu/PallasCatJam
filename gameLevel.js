@@ -35,21 +35,13 @@ function buildLevel()
 //    for (let i=3; i--;)
 //        new ParallaxLayer(i);
     //new ParallaxLayer2(1, 2143, 1080, 4, vec2(6170,4257));
-    new ParallaxLayer2(0, 1920,  977, 3, vec2(960,437),   -3000);     // sky
-    new ParallaxLayer2(9,  256,  256, 8, vec2(5652,3416), -2999);  // sun
-    new ParallaxLayer2(1, 2143, 1080, 4, vec2(3108,1507), -2998);  // mountains
-    new ParallaxLayer2(2, 2143, 1080, 5, vec2(4597,1507), -2007);
-    new ParallaxLayer2(3, 2143, 1080, 6, vec2(5652,3416), -2006);
-    new ParallaxLayer2(4, 2143, 1080, 7, vec2(6270,3416), -2005);
+    new ParallaxLayer2(0, 1920,  977, IMAGE_BG1, vec2(960,437),   -3000);  // sky
+    new ParallaxLayer2(9,  256,  256, IMAGE_SUN, vec2(5652,3416), -2999);  // sun
+    new ParallaxLayer2(1, 2143, 1080, IMAGE_BG2, vec2(3108,1507), -2998);  // mountains
+    new ParallaxLayer2(2, 2143, 1080, IMAGE_BG3, vec2(4597,1507), -2007);
+    new ParallaxLayer2(3, 2143, 1080, IMAGE_BG4, vec2(5652,3416), -2006);
+    new ParallaxLayer2(4, 2143, 1080, IMAGE_BG5, vec2(6270,3416), -2005);
     
-    // apply decoration to all level tiles
-    const pos = vec2();
-    const layerCount = tileLayers.length;
-    for (let layer=layerCount; layer--;)
-    for (pos.x=levelSize.x; pos.x--;)
-    for (pos.y=levelSize.y; pos.y--;)
-        decorateTile(pos, layer);
-
     // warm up level
     warmup = 1;
     for (let i = 500; i--;)
@@ -73,13 +65,16 @@ function loadLevel(level=0)
     const tileLookup =
     {
         circle: 1,
-        ground: 2,
+        ground: 2,  // destructable
         ladder: 4,
         metal:  5,
         player: 17,
-        crate:  18,
+        crate:  18,  // why are crates special?
         enemy:  19,
         coin:   20,
+        platform_start: 80,
+        object_start: 17,
+        object_end: 20,
     }
 
     // set all level data tiles
@@ -102,7 +97,7 @@ function loadLevel(level=0)
             const pos = vec2(x,levelSize.y-1-y);
             const tile = layerData[y*levelSize.x+x];
 
-            if (tile >= tileLookup.player)
+            if (tile >= tileLookup.object_start && tile <= tileLookup.object_end)
             {
                 // create object instead of tile
                 const objectPos = pos.add(vec2(.5));
@@ -126,17 +121,17 @@ function loadLevel(level=0)
                 tileType = tileType_breakable;
             if (tile == tileLookup.ladder)
                 tileType = tileType_ladder;
-            if (tile == tileLookup.metal || tile == 6 || tile == 6 || tile == 7 || tile == 8 || tile == 9)
+            if (tile == tileLookup.metal || tile > tileLookup.platform_start)
                 tileType = tileType_solid;
             if (tileType)
             {
-                // set collision for solid tiles
+                // set collision for solid tiles - CONFUSING!!!!   "solid" sometimes refers to UNBREAKABLE metal tiles AND alos all FORGROUND tiles that cannot be walked through????
                 if (layer == foregroundLayerIndex)
-                    setTileCollisionData(pos, tileType);
+                    setTileCollisionData(pos, tileType);  // JAU how does this work?
 
                 // randomize tile appearance
                 let direction, mirror, color;
-                if (tileType == tileType_breakable)
+                if (tileType == tileType_breakable)  // breakable somehow are rotated and mirrored and colored. why?
                 {
                     direction = randInt(4);
                     mirror = randInt(2);
@@ -144,66 +139,11 @@ function loadLevel(level=0)
                     color = color.mutate(.03);
                 }
 
-                // set tile layer data
+                // set tile layer data - LittleJS Layer Grid treats direction, mirror and color as first order attributes
                 const data = new TileLayerData(tile-1, direction, mirror, color);
                 tileLayer.setData(pos, data);
             }
         }
         tileLayer.redraw();
-    }
-}
-
-function decorateTile(pos, layer=1)
-{
-    ASSERT((pos.x|0) == pos.x && (pos.y|0)== pos.y);
-    const tileLayer = tileLayers[layer];
-
-    if (layer == foregroundLayerIndex)
-    {
-        const tileType = getTileCollisionData(pos);
-        if (tileType <= 0)
-        {
-            // force it to clear if it is empty
-            tileType || tileLayer.setData(pos, new TileLayerData, 1);
-            return;
-        }
-        if (tileType == tileType_breakable)
-        for (let i=4;i--;)
-        {
-            // outline towards neighbors of differing type
-            const neighborTileType = getTileCollisionData(pos.add(vec2().setDirection(i)));
-            if (neighborTileType == tileType)
-                continue;
-
-            // make pixel perfect outlines
-            const size = i&1 ? vec2(2, 16) : vec2(16, 2);
-            tileLayer.context.fillStyle = levelOutlineColor.mutate(.1);
-            const drawPos = pos.scale(16)
-                .add(vec2(i==1?14:0,(i==0?14:0)))
-                .subtract((i&1? vec2(0,8-size.y/2) : vec2(8-size.x/2,0)));
-            tileLayer.context.fillRect(
-                drawPos.x, tileLayer.canvas.height - drawPos.y, size.x, -size.y);
-        }
-    }
-    else
-    {
-        // make round corners
-        for (let i=4;i--;)
-        {
-            // check corner neighbors
-            const neighborTileDataA = getTileData(pos.add(vec2().setDirection(i)), layer);
-            const neighborTileDataB = getTileData(pos.add(vec2().setAngle((i+1)%4*PI/2)), layer);
-            if (neighborTileDataA > 0 || neighborTileDataB > 0)
-                continue;
-
-            const directionVector = vec2().setAngle(i*PI/2+PI/4, 10).floor();
-            const drawPos = pos.add(vec2(.5))            // center
-                .scale(16).add(directionVector).floor(); // direction offset
-
-            // clear rect without any scaling to prevent blur from filtering
-            const s = 2;
-            tileLayer.context.clearRect(
-                drawPos.x - s/2, tileLayer.canvas.height - drawPos.y - s/2, s, s);
-        }
     }
 }
