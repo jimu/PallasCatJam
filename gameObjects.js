@@ -68,7 +68,7 @@ class Crate extends GameObject
     { 
         super(pos, vec2(.999), spriteAtlas.crate, (randInt(4))*PI/2);
 
-        this.color = hsl(rand(),1,.8);
+        this.color = hsl(rand(0.5, 0.66), rand(0.3, 0.7), rand(0.2, 0.8));
         this.health = 5;
 
         // make it a solid object for collision
@@ -88,11 +88,13 @@ class Crate extends GameObject
 
 ///////////////////////////////////////////////////////////////////////////////
 
+let berryCount = 0
+
 class Coin extends EngineObject 
 {
-    constructor(pos) 
+    constructor(pos, tile)
     { 
-        super(pos, vec2(1), spriteAtlas.coin);
+        super(pos, vec2(berryCount++ % 2 ? 1 : -1, 1), tile);
         this.color = hsl(.15,1,.5);
     }
 
@@ -110,6 +112,19 @@ class Coin extends EngineObject
         ++score;
         sound_score.play(this.pos);
         this.destroy();
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+class Bush extends EngineObject 
+{
+    constructor(pos, tile)
+    { 
+        console.log('bush')
+        super(pos.add(vec2(0,0.5)), vec2(berryCount++ % 2 ? 1 : -1, 1), tile);
+        this.size = vec2(2,2)
+        this.gravityScale = 0;
     }
 }
 

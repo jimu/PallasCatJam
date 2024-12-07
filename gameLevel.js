@@ -65,13 +65,21 @@ function loadLevel(level=0)
         ground: 2,  // destructable
         ladder: 4,
         metal:  5,
+
+        object_start: 15,
+        bush1:  15,
+        bush2:  16,
         player: 17,
         crate:  18,  // why are crates special?
         enemy:  19,
-        coin:   20,
+        coin:    20,
+        berries: 21,
+        flowers1: 22,
+        flowers2: 23,
+        object_end: 23,
+
         platform_start: 80,
-        object_start: 17,
-        object_end: 20,
+
     }
 
     // set all level data tiles
@@ -94,7 +102,7 @@ function loadLevel(level=0)
             const pos = vec2(x,levelSize.y-1-y);
             const tile = layerData[y*levelSize.x+x];
 
-            if (tile >= tileLookup.object_start && tile <= tileLookup.object_end)
+            if (tile >= tileLookup.object_start && tile <= tileLookup.object_end || tile == tileLookup.flowers1)
             {
                 // create object instead of tile
                 const objectPos = pos.add(vec2(.5));
@@ -104,8 +112,18 @@ function loadLevel(level=0)
                     new Crate(objectPos);
                 if (tile == tileLookup.enemy)
                     new Enemy(objectPos);
-                if (tile == tileLookup.coin)
-                    new Coin(objectPos);
+                else if (tile == tileLookup.coin)
+                    new Coin(objectPos, spriteAtlas.ham);
+                else if (tile == tileLookup.berries)
+                    new Coin(objectPos, spriteAtlas.berries);
+                else if (tile == tileLookup.bush1)
+                    new Bush(objectPos, spriteAtlas.bush1);
+                else if (tile == tileLookup.bush2)
+                    new Bush(objectPos, spriteAtlas.bush2);
+                else if (tile == tileLookup.flowers1)
+                    new Bush(objectPos, spriteAtlas.flowers1);
+                else if (tile == tileLookup.flowers2)
+                    new Bush(objectPos, spriteAtlas.flowers2);
                 continue;
             }
 
@@ -124,15 +142,14 @@ function loadLevel(level=0)
             {
                 // set collision for solid tiles - CONFUSING!!!!   "solid" sometimes refers to UNBREAKABLE metal tiles AND alos all FORGROUND tiles that cannot be walked through????
                 if (layer == foregroundLayerIndex)
-                    setTileCollisionData(pos, tileType);  // JAU how does this work?
-
+                    setTileCollisionData(pos, tileType);  // JAU how does this work?  
                 // randomize tile appearance
                 let direction, mirror, color;
                 if (tileType == tileType_breakable)  // breakable somehow are rotated and mirrored and colored. why?
                 {
-                    direction = randInt(4);
+                    //direction = randInt(4);
                     mirror = randInt(2);
-                    color = layer ? levelColor : levelBackgroundColor;
+                    color = layer || tile == tileLookup.flowers1 || tile == tileLookup.flowers2 ? levelColor : levelBackgroundColor;
                     color = color.mutate(.03);
                 }
 

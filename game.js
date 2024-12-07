@@ -19,6 +19,9 @@ const IMAGE_BG3 = 5
 const IMAGE_BG4 = 6
 const IMAGE_BG5 = 7
 const IMAGE_SUN = 8
+const IMAGE_FLOWERS = 9
+const IMAGE_BUSH1 = 10
+const IMAGE_BUSH2 = 11
 
 const IMAGES = [
   'tiles2.png',
@@ -28,7 +31,12 @@ const IMAGES = [
   'bg2_mountains.png',
   'bg3_big_rocks.png',
   'bg4_trees.png',
-  'bg5_short_rocks.png', 'sun.png'];
+  'bg5_short_rocks.png',
+  'sun.png',
+  'images/flowers_128x128.png',
+  'images/bush_1.png',
+  'images/bush_2.png',
+];
 const SIZE_HD = vec2(1920, 1024);
 const INDEX_HD1 = 2
 
@@ -60,7 +68,14 @@ function gameInit()
 
         //ham:     tile(3, vec2(64)),
         ham:     tile(20, vec2(64)),
+        berries: tile(21, vec2(64)),
+
+        flowers1: tile(0, vec2(128), IMAGE_FLOWERS),
+        flowers2: tile(1, vec2(128), IMAGE_FLOWERS),
+        bush1: tile(0, vec2(400), IMAGE_BUSH1),
+        bush2: tile(0, vec2(400), IMAGE_BUSH2),
     };
+
     // setup level
     buildLevel();
 
@@ -72,10 +87,7 @@ function gameInit()
     cameraScale = 4*16 *1.20;
     cameraPos = getCameraTarget();
 
-    //new GameObject(vec2(0), vec2(64), spriteAtlas['ham']);
-    //w.ham = new GameObject(vec2(0), vec2(64/8), spriteAtlas['ham']);
-    //w.ham.gravityScale = 0
-    //w.ham.renderOrder = 1000;
+    playAudioFile('music/game jam song fuller.mp3', 1, true)
 }
 
 ///////////////////////////////////////////////////////////////////////////////

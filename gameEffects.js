@@ -250,8 +250,8 @@ class ParallaxLayer extends EngineObject
         
         // draw the parallax layer onto the main canvas
         const pos2 = pos.add(this.offset)
-        if (this.index == 4)
-          console.log(`index: ${this.index}, pos: ${pos}, pos2: ${pos2}, cameraDeltaFromCenter: ${cameraDeltaFromCenter}`) // -64 28
+//        if (this.index == 4)
+//          console.log(`index: ${this.index}, pos: ${pos}, pos2: ${pos2}, cameraDeltaFromCenter: ${cameraDeltaFromCenter}`) // -64 28
 
         if (this.index == 9) {  // sun
           drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, false, true)
@@ -259,9 +259,9 @@ class ParallaxLayer extends EngineObject
           //drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
           //mainContext.drawImage(this.canvas, mainCanvasSize.x/2, 100);
         }
-        else if (this.renderOrder == 1000)
+        else if (this.renderOrder == 1000) // foreground
           //drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, true, true)
-          overlayContext.drawImage(this.canvas, pos2.x, 0);
+          overlayContext.drawImage(this.canvas, pos2.x - 285, 0);
         else if (this.index >= 0)
           mainContext.drawImage(this.canvas, pos2.x, 0);
         //console.log(pos.x, pos.y) // -64 28
