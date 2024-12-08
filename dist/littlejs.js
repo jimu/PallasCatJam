@@ -53,6 +53,8 @@ let debugOverlay = false;
 // Engine internal variables not exposed to documentation
 let debugPrimitives = [], debugPhysics = false, debugRaycast = false, debugParticles = false, debugGamepads = false, debugMedals = false, debugTakeScreenshot, downloadLink;
 
+let renderMask = 1;
+
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
 
@@ -1934,6 +1936,8 @@ class EngineObject
         /** @property {Boolean} - Object collides with raycasts */
         this.collideRaycast = false;
 
+        this.renderMask = 1;
+
         // add to list of objects
         engineObjects.push(this);
     }
@@ -2144,7 +2148,10 @@ class EngineObject
     render()
     {
         // default object render
-        drawTile(this.pos, this.drawSize || this.size, this.tileInfo, this.color, this.angle, this.mirror, this.additiveColor);
+        if (renderMask & this.renderMask) {
+          console.log(renderMask, this.renderMask)
+          drawTile(this.pos, this.drawSize || this.size, this.tileInfo, this.color, this.angle, this.mirror, this.additiveColor);
+        }
     }
     
     /** Destroy this object, destroy it's children, detach it's parent, and mark it for removal */

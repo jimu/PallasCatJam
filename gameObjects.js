@@ -121,7 +121,6 @@ class Bush extends EngineObject
 {
     constructor(pos, tile)
     { 
-        console.log('bush')
         super(pos.add(vec2(0,0.5)), vec2(berryCount++ % 2 ? 1 : -1, 1), tile);
         this.size = vec2(2,2)
         this.gravityScale = 0;
