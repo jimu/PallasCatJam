@@ -11,7 +11,7 @@ const GameState = {
 let gameState = GameState.INIT;
 
 function setGameState(state) {
-  console.log(`setGameState: ${gameState} => ${state}`)
+  //console.log(`setGameState: ${gameState} => ${state}`)
   gameState = state
 
   uiRoot.visible = gameState == GameState.STARTMENU
@@ -19,8 +19,5 @@ function setGameState(state) {
   uiAboutScreen.visible = gameState == GameState.ABOUT
   uiHighScoresScreen.visible = gameState == GameState.HIGHSCORE
 
-  if (gameState == GameState.CREDITS) console.log("credits")
-  if (gameState == GameState.HIGHSCORE) console.log("highscore")
-  if (gameState == GameState.ABOUT) console.log("about")
   renderMask = gameState == GameState.PLAYING ? 1 : 2;
 }

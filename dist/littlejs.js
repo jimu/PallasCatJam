@@ -2149,7 +2149,6 @@ class EngineObject
     {
         // default object render
         if (renderMask & this.renderMask) {
-          console.log(renderMask, this.renderMask)
           drawTile(this.pos, this.drawSize || this.size, this.tileInfo, this.color, this.angle, this.mirror, this.additiveColor);
         }
     }

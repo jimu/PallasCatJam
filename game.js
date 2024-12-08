@@ -8,8 +8,8 @@
 
 'use strict';
 
-const enableMusic = false
-const enableBackground = false;
+const enableMusic = true
+const enableBackground = true;
 const TESTAPP = 0
 
 const w = window
@@ -123,7 +123,7 @@ function gameInit()
     uiStartMenuBackground.color = RED;
     uiRoot.addChild(uiStartMenuBackground);
 
-    console.log(spriteAtlas['start_menu_buttons'])
+    //console.log(spriteAtlas['start_menu_buttons'])
     const buttonx = -360
     const uiButtonPlay = new UITile(vec2(buttonx, -200), SIZE_BUTTON, spriteAtlas['start_menu_button_play'])
     const uiButtonCredits = new UITile(vec2(buttonx, 0), SIZE_BUTTON, spriteAtlas['start_menu_button_credits'])
@@ -238,18 +238,22 @@ function gameRenderPost()
           overlayContext.strokeText(text, x, y);
           overlayContext.fillText(text, x, y);
       }
-      drawText('Grumpiness: 2' ,   overlayCanvas.width*1/4, 20);
-      drawText('Snacks: ' , overlayCanvas.width*3/4, 20);
+      drawText(`Warmth: ${score}`, overlayCanvas.width*1/8, 20);
+      drawText('Snacks: ', overlayCanvas.width*3/4, 20);
 
       var x = overlayCanvas.width*3/4 + 110
       const inc = 64
-      drawTile(vec2(x, 35), vec2(64), spriteAtlas['ham'], undefined, 0, false, undefined, false, true);
-      drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], undefined, 0, false, undefined, true, true);
-      drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], GRAY, 0, false, undefined, true, true);
-      drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], GRAY, 0, false, undefined, true, true);
-      drawTile(vec2(x += inc, 35), vec2(64), spriteAtlas['ham'], GRAY, 0, false, undefined, true, true);
+      drawSnack(x += inc, score >= 1)
+      drawSnack(x += inc, score >= 2)
+      drawSnack(x += inc, score >= 3)
+      drawSnack(x += inc, score >= 4)
+      drawSnack(x += inc, score >= 5)
       break;
   }
+}
+
+function drawSnack(x, isOn) {
+  drawTile(vec2(x, 35), vec2(64), spriteAtlas['ham'], isOn ? undefined : GRAY, 0, false, undefined, true, true);
 }
 
 
