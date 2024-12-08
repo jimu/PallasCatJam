@@ -152,10 +152,16 @@ function gameInit()
 function buildScreen(text, gameState) {
   const centerX = mainCanvasSize.x / 2.0
 
-  const uiScreen = new UIText(vec2(centerX, 50), vec2(1000, 70), text, gameState);
+  const uiScreen = new UIObject(vec2(mainCanvasSize.x/2,0));
+  const uiTitle = new UIText(vec2(-300, 50), vec2(1000, 70), text, gameState);
   uiScreen.textColor = WHITE;
   uiScreen.lineWidth = 8;
   uiScreen.visible = false
+
+  const okButton = new UIButton(vec2(0, 200), vec2(400, 70), 'Ok', GameState.STARTMENU)
+  okButton.onClick = () => setGameState(GameState.STARTMENU)
+  uiScreen.addChild(uiTitle)
+  uiScreen.addChild(okButton)
 
   return uiScreen
 }
