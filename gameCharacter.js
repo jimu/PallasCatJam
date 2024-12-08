@@ -216,7 +216,7 @@ class Character extends GameObject
         // update animation
         const animationFrame = this.isDead() ? 0 :
             this.climbingLadder || this.groundTimer.active() ?
-            2*this.walkCyclePercent|0 :
+            2 * this.walkCyclePercent|0 :
             this.jumpTimer.get() % 0.3 > 0.15 ? 2 : 3;
 
         this.tileInfo = spriteAtlas.player.frame(animationFrame);

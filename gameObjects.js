@@ -127,6 +127,29 @@ class Bush extends EngineObject
     }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+
+class Cave extends EngineObject 
+{
+    constructor(pos, tile)
+    { 
+        super(pos.add(vec2(0,0.4)), vec2(1, 1), tile);
+        this.size = vec2(3, 2)
+        this.gravityScale = 0;
+    }
+    
+    update() {
+      super.update();
+
+      if (!player)
+          return;
+
+      if (isOverlapping(this.pos, this.size, player.pos, player.size))
+          setGameState(GameState.WIN)
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class Enemy extends GameObject 

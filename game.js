@@ -9,6 +9,7 @@
 'use strict';
 
 const enableMusic = true
+const enableStartMenu = true
 const enableBackground = true;
 const TESTAPP = 0
 
@@ -46,10 +47,13 @@ const IMAGES = [
   'images/start_menu_buttons.png',
   'images/logocat.png',
 ];
+
 const SIZE_HD = vec2(1920, 1080);
 const SIZE_BUTTON = vec2(600, 300);
 const SIZE_LOGOCAT = vec2(1071, 836);
+const SIZE_CAVE = vec2(192, 128);
 const INDEX_HD1 = 2
+const STARTING_WARMTH = 20
 
 window.alpha = 1
 
@@ -63,39 +67,45 @@ const size = vec2;
 let uiCreditsScreen;
 let uiHighScoresScreen;
 let uiAboutScreen;
+let uiWinScreen;
+let warmthTimer;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit()
 {
     // create a table of all sprites
-    spriteAtlas =
-    {
-        // large tiles
-        circle:  tile(0),
-        crate:   tile(2),
-        player:  tile(1, vec2(128)),
-        enemy:   tile(5),
-        coin:    tile(20, vec2(64)),
+    spriteAtlas = {
+      // large tiles
+      circle:  tile(0),
+      crate:   tile(2),
+      player:  tile(1, vec2(128)),
+      fox:     tile(6, vec2(128)),
+      enemy:   tile(5),
+      coin:    tile(20, vec2(64)),
 
-        // small tiles
-        gun:     tile(2,8),
-        grenade: tile(3,8),
+      // small tiles
+      gun:     tile(2,8),
+      grenade: tile(3,8),
 
-        //ham:     tile(3, vec2(64)),
-        ham:     tile(20, vec2(64)),
-        berries: tile(21, vec2(64)),
+      //ham:     tile(3, vec2(64)),
+      ham:     tile(20, vec2(64)),
+      berries: tile(21, vec2(64)),
 
-        flowers1: tile(0, vec2(128), IMAGE_FLOWERS),
-        flowers2: tile(1, vec2(128), IMAGE_FLOWERS),
-        bush1: tile(0, vec2(400), IMAGE_BUSH1),
-        bush2: tile(0, vec2(400), IMAGE_BUSH2),
+      flowers1: tile(0, vec2(128), IMAGE_FLOWERS),
+      flowers2: tile(1, vec2(128), IMAGE_FLOWERS),
+      bush1: tile(0, vec2(400), IMAGE_BUSH1),
+      bush2: tile(0, vec2(400), IMAGE_BUSH2),
 
-        start_menu_background: tile(0, SIZE_HD, IMAGE_UI),
-        start_menu_button_play: tile(0, SIZE_BUTTON, IMAGE_UI_BUTTONS),
-        start_menu_button_credits: tile(1, SIZE_BUTTON, IMAGE_UI_BUTTONS),
-        start_menu_button_about: tile(2, SIZE_BUTTON, IMAGE_UI_BUTTONS),
-        start_menu_button_scores: tile(3, SIZE_BUTTON, IMAGE_UI_BUTTONS),
-        logocat: tile(0, SIZE_LOGOCAT, IMAGE_LOGOCAT),
+      start_menu_background: tile(0, SIZE_HD, IMAGE_UI),
+      start_menu_button_play: tile(0, SIZE_BUTTON, IMAGE_UI_BUTTONS),
+      start_menu_button_credits: tile(1, SIZE_BUTTON, IMAGE_UI_BUTTONS),
+      start_menu_button_about: tile(2, SIZE_BUTTON, IMAGE_UI_BUTTONS),
+      start_menu_button_scores: tile(3, SIZE_BUTTON, IMAGE_UI_BUTTONS),
+
+      logocat: tile(0, SIZE_LOGOCAT, IMAGE_LOGOCAT),
+      logocat1: tile(1, SIZE_LOGOCAT, IMAGE_LOGOCAT),
+
+      cave: tile(pos(0,3), SIZE_CAVE)
     };
 
     // setup level
@@ -125,11 +135,12 @@ function gameInit()
 
     //console.log(spriteAtlas['start_menu_buttons'])
     const buttonx = -360
+    const catPos = vec2(180, 180); // vec2(180, 120)
     const uiButtonPlay = new UITile(vec2(buttonx, -200), SIZE_BUTTON, spriteAtlas['start_menu_button_play'])
     const uiButtonCredits = new UITile(vec2(buttonx, 0), SIZE_BUTTON, spriteAtlas['start_menu_button_credits'])
     const uiButtonAbout = new UITile(vec2(buttonx, 200), SIZE_BUTTON, spriteAtlas['start_menu_button_about'])
     const uiButtonHighScores = new UITile(vec2(buttonx, 400), SIZE_BUTTON, spriteAtlas['start_menu_button_scores'])
-    w.uiLogocat = new UITile(vec2(180, 120), SIZE_LOGOCAT, spriteAtlas['logocat'])
+    const uiLogocat = new UIAnim(catPos, SIZE_LOGOCAT.scale(0.8), spriteAtlas['logocat'], 5, 8)
 
     uiStartMenuBackground.addChild(uiButtonPlay);
     uiStartMenuBackground.addChild(uiButtonCredits);
@@ -144,9 +155,11 @@ function gameInit()
 
     uiCreditsScreen    = buildScreen('Credits Placeholder', GameState.CREDITS)
     uiHighScoresScreen = buildScreen('High Scores Placeholder', GameState.HIGHSCORE)
-    uiAboutScreen = buildScreen('About Placeholder', GameState.HIGHSCORE)
+    uiAboutScreen = buildScreen('About Placeholder', GameState.ABOUT)
+    uiWinScreen = buildScreen('Win Placeholder', GameState.WIN)
 
-    setGameState(GameState.STARTMENU)
+    warmthTimer = new Timer(STARTING_WARMTH)
+    setGameState(enableStartMenu ? GameState.STARTMENU : GameState.PLAYING )
 }
 
 function buildScreen(text, gameState) {
@@ -204,12 +217,15 @@ function gameUpdate()
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 function getCameraTarget()
 {
     // camera is above player
-    const offset = 200/cameraScale*percent(mainCanvasSize.y, 300, 600);
-    return player.pos.add(vec2(0, offset));
+    //const offset = 200/cameraScale*percent(mainCanvasSize.y, 300, 400);
+    //console.log(offset)
+    //return player.pos.add(vec2(0, offset));
+    return player.pos;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -244,7 +260,7 @@ function gameRenderPost()
           overlayContext.strokeText(text, x, y);
           overlayContext.fillText(text, x, y);
       }
-      drawText(`Warmth: ${score}`, overlayCanvas.width*1/8, 20);
+      drawText(`Warmth: ${Math.max(-Math.floor(warmthTimer.get()/2), 0)}`, overlayCanvas.width*1/8, 20);
       drawText('Snacks: ', overlayCanvas.width*3/4, 20);
 
       var x = overlayCanvas.width*3/4 + 110
@@ -254,6 +270,7 @@ function gameRenderPost()
       drawSnack(x += inc, score >= 3)
       drawSnack(x += inc, score >= 4)
       drawSnack(x += inc, score >= 5)
+
       break;
   }
 }
@@ -261,7 +278,6 @@ function gameRenderPost()
 function drawSnack(x, isOn) {
   drawTile(vec2(x, 35), vec2(64), spriteAtlas['ham'], isOn ? undefined : GRAY, 0, false, undefined, true, true);
 }
-
 
 // TESTAPP
 

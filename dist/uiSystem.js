@@ -208,6 +208,29 @@ class UITile extends UIObject
 
 ///////////////////////////////////////////////////////////////////////////////
 
+class UIAnim extends UIObject
+{
+  constructor(pos, size, tileInfo, numFrames, framesPerSecond)
+  {
+    super(pos, size);
+
+    this.tileInfo = tileInfo;
+    this.numFrames = numFrames
+    this.framesPerSecond = framesPerSecond
+    this.firstFrame = 16
+  }
+
+  render()
+  {
+    const numFrames = this.numFrames + this.firstFrame
+    const frame = Math.max(0, Math.floor(Date.now() / 1000 * this.framesPerSecond / numFrames % 1 * numFrames) - this.firstFrame)
+    //const frame = Math.floor(Date.now() / 1000 * this.framesPerSecond / this.numFrames % 1 * this.numFrames)
+    drawUITile(this.pos, this.size, this.tileInfo.frame(frame));
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 class UIButton extends UIObject
 {
     constructor(pos, size, text)
