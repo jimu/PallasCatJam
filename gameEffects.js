@@ -190,7 +190,7 @@ class Sky extends EngineObject
 
 class ParallaxLayer extends EngineObject
 {
-    constructor(index, w, h, textureIndex, offset, renderOrder) 
+    constructor(index, w, h, textureIndex, offset, renderOrder, type) 
     {
         super();
 
@@ -206,12 +206,13 @@ class ParallaxLayer extends EngineObject
         this.canvas.width = size.x;
         this.canvas.height = size.y;
         this.offset = offset
+        this.type = type
         //this.context.drawImage(textureInfo.image, x, y, w, h, -.5, -.5, 1, 1);
 
         //drawTile(vec2(0), size, tile(2), undefined, 0, false, undefined, false, true, this.context)
         // draws the image centered at position
 
-        if (this.index > 8)
+        if (this.type == PLTYPE_SUN)
           drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
         else
           drawTile(size.scale(0.5), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
@@ -220,6 +221,7 @@ class ParallaxLayer extends EngineObject
     drawSun() {
         //mainContext.drawImage(this.canvas, mainCanvasSize.x/2, 100);
         const no_mirror = false
+          drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
         const angle = 0; // rand();
         drawCanvas2D(this.pos, this.size, angle, no_mirror, (context)=>
         {
@@ -253,15 +255,17 @@ class ParallaxLayer extends EngineObject
 //        if (this.index == 4)
 //          console.log(`index: ${this.index}, pos: ${pos}, pos2: ${pos2}, cameraDeltaFromCenter: ${cameraDeltaFromCenter}`) // -64 28
 
-        if (this.index == 9) {  // sun
+        if (this.type == PLTYPE_SUN) {  // sun
           drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, false, true)
           //drawTile(pos, size=vec2(1), tileInfo, color=new Color, angle=0, mirror, additiveColor=new Color(0,0,0,0), useWebGL=glEnable, screenSpace, context)
           //drawTile(vec2(0), size, tile(0, size, textureIndex), undefined, 0, false, undefined, false, true, this.context)
           //mainContext.drawImage(this.canvas, mainCanvasSize.x/2, 100);
         }
-        else if (this.renderOrder == 1000) // foreground
+        else if (this.type == PLTYPE_FOREGROUND) {// foreground
           //drawTile(vec2(mainCanvasSize.x/2 - 200, 200), this.size, tile(0, this.size, 8), undefined, time/6, false, undefined, true, true)
-          overlayContext.drawImage(this.canvas, pos2.x - 285, 0);
+          overlayContext.drawImage(this.canvas, -1, 0);
+          console.log('rocks')
+          }
         else if (this.index >= 0)
           mainContext.drawImage(this.canvas, pos2.x, 0);
         //console.log(pos.x, pos.y) // -64 28

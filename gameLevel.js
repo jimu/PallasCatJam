@@ -12,6 +12,9 @@ const tileType_empty     = 0;
 const tileType_solid     = 1;
 const tileType_breakable = 2;
 
+const PLTYPE_SUN = 1
+const PLTYPE_FOREGROUND = 2
+
 let player, playerStartPos, tileData, tileLayers, foregroundLayerIndex, sky;
 let levelSize, levelColor, levelBackgroundColor, levelOutlineColor, warmup;
 
@@ -20,13 +23,13 @@ const setTileData = (pos, layer, data)=>
 const getTileData = (pos, layer)=>
     pos.arrayCheck(tileCollisionSize) ? tileData[layer][(pos.y|0)*tileCollisionSize.x+pos.x|0]: 0;
 
-function buildLevel()
+function buildLevel(level=0)
 {
     // create the level
     levelColor = randColor(hsl(0,0,.2), hsl(0,0,.8));
     levelBackgroundColor = levelColor.mutate().scale(.4,1);
     levelOutlineColor = levelColor.mutate().add(hsl(0,0,.4)).clamp();
-    loadLevel();
+    loadLevel(level);
 
     if (enableBackground) {
       // create sky object with gradient and stars
@@ -34,11 +37,13 @@ function buildLevel()
 
       // create parallax layers
       new ParallaxLayer(0, 1920,  977, IMAGE_BG1, vec2(960,437),   -3000);  // sky
-      new ParallaxLayer(9,  256,  256, IMAGE_SUN, vec2(5652,3416), -2999);  // sun
+      new ParallaxLayer(9,  256,  256, IMAGE_SUN, vec2(5652,3416), -2999, PLTYPE_SUN);  // sun
       new ParallaxLayer(1, 2143, 1080, IMAGE_BG2, vec2(3108,1507), -2998);  // mountains
       new ParallaxLayer(2, 2143, 1080, IMAGE_BG3, vec2(4597,1507), -2006);  // big rocks
       new ParallaxLayer(3, 2143, 1080, IMAGE_BG4, vec2(5652,3416), -2007);  // trees
-      new ParallaxLayer(4, 2143, 1080, IMAGE_BG5, vec2(6270,3416), 1000);  // rocks
+      //new ParallaxLayer(4, 2143, 1080, IMAGE_BG5, vec2(6270,3416), 1000, PLTYPE_FOREGROUND);  // rocks
+      //new ParallaxLayer(4, 2143, 1080, IMAGE_BG5, vec2(5800,3416), -1000);  // rocks
+      new ParallaxLayer(3, 2143, 1080, IMAGE_BG5, vec2(5800,3416), -1000);  // rocks
     }
     
     // warm up level

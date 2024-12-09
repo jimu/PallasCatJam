@@ -142,7 +142,7 @@ class Cave extends EngineObject
     update() {
       super.update();
 
-      if (!player)
+      if (!player || gameState != GameState.PLAYING)
           return;
 
       if (isOverlapping(this.pos, this.size, player.pos, player.size))

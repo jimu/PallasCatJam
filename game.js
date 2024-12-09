@@ -8,7 +8,7 @@
 
 'use strict';
 
-const enableMusic = true
+const enableMusic = false
 const enableStartMenu = true
 const enableBackground = true;
 const TESTAPP = 0
@@ -48,7 +48,7 @@ const IMAGES = [
   'images/logocat.png',
 ];
 
-const SIZE_HD = vec2(1920, 1080);
+const SIZE_UI = vec2(1920, 1080);
 const SIZE_BUTTON = vec2(600, 300);
 const SIZE_LOGOCAT = vec2(1071, 836);
 const SIZE_CAVE = vec2(192, 128);
@@ -68,7 +68,20 @@ let uiCreditsScreen;
 let uiHighScoresScreen;
 let uiAboutScreen;
 let uiWinScreen;
-let warmthTimer;
+let warmthTimer = new Timer;
+let savedWarmthTimer;
+
+let currentLevelId = 0
+
+function initLevel(levelId=0) {
+  buildLevel(levelId % 2);
+  console.log(`initLevel(${levelId})`);
+  currentLevelId = levelId;
+
+  score = deaths = 0;
+  savedWarmthTimer = STARTING_WARMTH
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit()
@@ -96,7 +109,7 @@ function gameInit()
       bush1: tile(0, vec2(400), IMAGE_BUSH1),
       bush2: tile(0, vec2(400), IMAGE_BUSH2),
 
-      start_menu_background: tile(0, SIZE_HD, IMAGE_UI),
+      start_menu_background: tile(0, SIZE_UI, IMAGE_UI),
       start_menu_button_play: tile(0, SIZE_BUTTON, IMAGE_UI_BUTTONS),
       start_menu_button_credits: tile(1, SIZE_BUTTON, IMAGE_UI_BUTTONS),
       start_menu_button_about: tile(2, SIZE_BUTTON, IMAGE_UI_BUTTONS),
@@ -108,32 +121,56 @@ function gameInit()
       cave: tile(pos(0,3), SIZE_CAVE)
     };
 
-    // setup level
-    buildLevel();
+    initLevel(0)
 
     // init game
-    score = deaths = 0;
     gravity = -.01;
     objectDefaultDamping = .99;
     objectDefaultAngleDamping = .99;
     cameraScale = 4*16 *1.20;
     cameraPos = getCameraTarget();
 
+    buildUI()
+
     if (enableMusic)
       playAudioFile('music/game jam song fuller.mp3', 1, true)
 
-    // UI
-    initUISystem();
-    const centerX = mainCanvasSize.x / 2.0
+    setGameState(enableStartMenu ? GameState.ABOUT : GameState.PLAYING )
+}
 
-    w.uiRoot = new UIObject(vec2(mainCanvasSize.x/2,0));
+function scaleToFit(containerSize, containedSize) {
+  const xScale = containerSize.x / containedSize.x
+  const yScale = containerSize.y / containedSize.y
+  const scale = Math.min(xScale, yScale)
+  return Math.min(scale, 1.0)
+}
+
+const creditsTextLeft = "dev\nart\nmusic"
+const creditsTextRight = "alpha\nbeta\ndelta"
+const aboutText = 
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit,\n" +
+  "sed do eiusmod tempor incididunt ut labore et dolore magna\n" +
+  "aliqua. Ut enim ad minim veniam, quis nostrud exercitation\n" +
+  "ullamco laboris nisi ut aliquip ex ea commodo consequat.\n" +
+  "Duis aute irure dolor in reprehenderit in voluptate velit\n" +
+  "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint\n" +
+  "occaecat cupidatat non proident, sunt in culpa qui officia\n" +
+  "deserunt mollit anim id est laborum."
+
+function buildUI() {
+    initUISystem();
+
+    //const scale = scaleToFit(mainCanvasSize, SIZE_UI)
+    //uiScale = scale
+    //console.log(scale)
+
+    w.uiRoot = new UIObject(mainCanvasSize.scale(0.5)); // size is 0
     uiRoot.visible = true
 
-    w.uiStartMenuBackground = new UITile(vec2(0, mainCanvasSize.y/2), mainCanvasSize, spriteAtlas['start_menu_background'])
-    uiStartMenuBackground.color = RED;
+    // tiles are positioned in center of parent
+    w.uiStartMenuBackground = new UITile(vec2(0), SIZE_UI, spriteAtlas['start_menu_background'])
     uiRoot.addChild(uiStartMenuBackground);
 
-    //console.log(spriteAtlas['start_menu_buttons'])
     const buttonx = -360
     const catPos = vec2(180, 180); // vec2(180, 120)
     const uiButtonPlay = new UITile(vec2(buttonx, -200), SIZE_BUTTON, spriteAtlas['start_menu_button_play'])
@@ -153,28 +190,38 @@ function gameInit()
     uiButtonAbout.onClick = () => setGameState(GameState.ABOUT)
     uiButtonHighScores.onClick = () => setGameState(GameState.HIGHSCORE)
 
-    uiCreditsScreen    = buildScreen('Credits Placeholder', GameState.CREDITS)
-    uiHighScoresScreen = buildScreen('High Scores Placeholder', GameState.HIGHSCORE)
-    uiAboutScreen = buildScreen('About Placeholder', GameState.ABOUT)
-    uiWinScreen = buildScreen('Win Placeholder', GameState.WIN)
-
-    warmthTimer = new Timer(STARTING_WARMTH)
-    setGameState(enableStartMenu ? GameState.STARTMENU : GameState.PLAYING )
+    uiCreditsScreen    = buildScreen('Credits', GameState.CREDITS, creditsTextLeft, creditsTextRight)
+    uiHighScoresScreen = buildScreen('High Scores', GameState.HIGHSCORE, "50\n40\n30")
+    uiAboutScreen = buildScreen('About Pallas', GameState.ABOUT, aboutText)
+    uiWinScreen = buildScreen('A winner is you!', GameState.WIN, undefined, undefined, GameState.INITLEVEL, "Next Level")
 }
 
-function buildScreen(text, gameState) {
+function buildScreen(text, gameState, content, content2, nextGameState=GameState.STARTMENU, buttonText = "Ok") {
   const centerX = mainCanvasSize.x / 2.0
+  const half = mainCanvasSize.scale(0.5)
 
-  const uiScreen = new UIObject(vec2(mainCanvasSize.x/2,0));
-  const uiTitle = new UIText(vec2(-300, 50), vec2(1000, 70), text, gameState);
-  uiScreen.textColor = WHITE;
-  uiScreen.lineWidth = 8;
-  uiScreen.visible = false
+  //const uiScreen   = new UIObject(mainCanvasSize.scale(0.5), vec2(mainCanvasSize.x/2,10), vec2(200,100));
+  const uiScreen = new UIObject(half, half)
+  //uiScreen.textColor = WHITE;
+  //uiScreen.lineWidth = 8;
+  //uiScreen.visible = false
 
-  const okButton = new UIButton(vec2(0, 200), vec2(400, 70), 'Ok', GameState.STARTMENU)
-  okButton.onClick = () => setGameState(GameState.STARTMENU)
+  //const background = new UIObject(vec2(0,mainCanvasSize.y/2), vec2(800,300))
+  const uiTitle = new UIText(vec2(0, -200), vec2(1000, 70), text);
   uiScreen.addChild(uiTitle)
+
+  if (content2) {
+    uiScreen.addChild(new UIText(vec2(-20, -100), vec2(300, 50), content, 'right'));
+    uiScreen.addChild(new UIText(vec2( 20, -100), vec2(300, 50), content2, 'left'));
+  } else if (content) {
+    uiScreen.addChild(new UIText(vec2(0, -100), vec2(800, 30), content));
+  }
+
+  const okButton = new UIButton(vec2(0, 200), vec2(400, 40), buttonText, GameState.STARTMENU)
+  okButton.onClick = () => setGameState(nextGameState)
   uiScreen.addChild(okButton)
+
+  //uiScreen.addChild(background)
 
   return uiScreen
 }
@@ -245,7 +292,7 @@ function gameRenderPost()
 {
   switch(gameState) {
     case GameState.STARTMENU:
-      //drawTile(vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 2), vec2(SIZE_HD), spriteAtlas['start_menu_background'], GRAY, 0, false, undefined, false, true);
+      //drawTile(vec2(mainCanvasSize.x / 2, mainCanvasSize.y / 2), vec2(SIZE_UI), spriteAtlas['start_menu_background'], GRAY, 0, false, undefined, false, true);
       break;
 
     case GameState.PLAYING:

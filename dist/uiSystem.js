@@ -23,6 +23,7 @@ let uiDefaultFont        = 'arial';
 // ui system
 let uiObjects = [];
 let uiContext;
+let uiScale = 1.0;
 
 function initUISystem(context=overlayContext)
 {
@@ -54,6 +55,7 @@ function initUISystem(context=overlayContext)
             for(const c of o.children)
                 renderObject(c)
         }
+        uiContext.scale(uiScale, uiScale)
         uiObjects.forEach(o=> o.parent || renderObject(o));
     }
 }

@@ -6,21 +6,27 @@ const GameState = {
   CREDITS: 4,
   HIGHSCORE: 5,
   ABOUT: 6,
+  INITLEVEL: 7,
 }
   
 let gameState = GameState.INIT;
-let savedWarmthTimer;
 
 function setGameState(state) {
-  //console.log(`setGameState: ${gameState} => ${state}`)
+  console.log(`setGameState: ${gameState} => ${state}`)
+
+  if (state == GameState.INITLEVEL) {
+    initLevel(currentLevelId + 1)
+    console.log("init level")
+    state = GameState.PLAYING
+  }
 
   if (gameState == GameState.PLAYING)
     savedWarmthTimer = warmthTimer.get()
   else if (state == GameState.PLAYING && savedWarmthTimer)
     warmthTimer.set(savedWarmthTimer)
-    
 
   gameState = state
+  setPaused(gameState != GameState.PLAYING)
 
   uiRoot.visible = gameState == GameState.STARTMENU
   uiCreditsScreen.visible = gameState == GameState.CREDITS
@@ -29,5 +35,4 @@ function setGameState(state) {
   uiHighScoresScreen.visible = gameState == GameState.HIGHSCORE
 
   renderMask = gameState == GameState.PLAYING ? 1 : 2;
-
 }

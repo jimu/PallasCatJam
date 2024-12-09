@@ -13,6 +13,10 @@ class Player extends Character
 {
     update()
     {
+        if (keyWasPressed('KeyF')) {
+          toggleFullscreen();
+        }
+
         // player controls
         this.holdingJump   = keyIsDown('ArrowUp') || gamepadIsDown(0);
         this.holdingShoot  = !isUsingGamepad && mouseIsDown(0) || keyIsDown('KeyZ') || gamepadIsDown(2);
