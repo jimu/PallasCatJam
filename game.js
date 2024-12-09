@@ -8,10 +8,11 @@
 
 'use strict';
 
-const enableMusic = false
+const enableMusic = true
 const enableStartMenu = true
 const enableBackground = true;
 const TESTAPP = 0
+const debugGameState = GameState.ABOUT
 
 const w = window
 
@@ -29,6 +30,7 @@ const IMAGE_BUSH2 = 11
 const IMAGE_UI = 12
 const IMAGE_UI_BUTTONS = 13
 const IMAGE_LOGOCAT = 14
+const IMAGE_ICONS = 15
 
 const IMAGES = [
   'tiles2.png',
@@ -46,12 +48,14 @@ const IMAGES = [
   'images/ui.png',
   'images/start_menu_buttons.png',
   'images/logocat.png',
+  'images/icons.png',
 ];
 
 const SIZE_UI = vec2(1920, 1080);
 const SIZE_BUTTON = vec2(600, 300);
 const SIZE_LOGOCAT = vec2(1071, 836);
 const SIZE_CAVE = vec2(192, 128);
+const SIZE_ICON = vec2(200, 150);
 const INDEX_HD1 = 2
 const STARTING_WARMTH = 20
 
@@ -118,7 +122,10 @@ function gameInit()
       logocat: tile(0, SIZE_LOGOCAT, IMAGE_LOGOCAT),
       logocat1: tile(1, SIZE_LOGOCAT, IMAGE_LOGOCAT),
 
-      cave: tile(pos(0,3), SIZE_CAVE)
+      cave: tile(pos(0,3), SIZE_CAVE),
+
+      icon_mouse:  tile(0, SIZE_ICON, IMAGE_ICONS),
+      icon_pallas: tile(1, SIZE_ICON, IMAGE_ICONS),
     };
 
     initLevel(0)
@@ -135,7 +142,7 @@ function gameInit()
     if (enableMusic)
       playAudioFile('music/game jam song fuller.mp3', 1, true)
 
-    setGameState(enableStartMenu ? GameState.ABOUT : GameState.PLAYING )
+    setGameState(debugGameState ? debugGameState : enableStartMenu ? GameState.STARTMENU : GameState.PLAYING )
 }
 
 function scaleToFit(containerSize, containedSize) {
@@ -148,14 +155,19 @@ function scaleToFit(containerSize, containedSize) {
 const creditsTextLeft = "dev\nart\nmusic"
 const creditsTextRight = "alpha\nbeta\ndelta"
 const aboutText = 
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit,\n" +
-  "sed do eiusmod tempor incididunt ut labore et dolore magna\n" +
-  "aliqua. Ut enim ad minim veniam, quis nostrud exercitation\n" +
-  "ullamco laboris nisi ut aliquip ex ea commodo consequat.\n" +
-  "Duis aute irure dolor in reprehenderit in voluptate velit\n" +
-  "esse cillum dolore eu fugiat nulla pariatur. Excepteur sint\n" +
-  "occaecat cupidatat non proident, sunt in culpa qui officia\n" +
-  "deserunt mollit anim id est laborum."
+  "The Pallas's cat (Otocolobus manul)\n" +
+  "\n"+
+  "    A small wild cat with long and dense light grey fur, and\n" +
+  "    rounded ears set low on the sides of the head.\n" +
+  "\n"+
+  "    IUCN Status: LEAST CONCERN (LC)\n" +
+  "\n"+
+  "Salt-Marsh Harvest Mouse (Reithrodontomys raviventris)\n" +
+  "\n"+
+  "    Also known as the red-bellied harvest mouse, an endangered\n" +
+  "    rodent endemic to the San Francisco Bay Area\n"+
+  "\n"+
+  "    IUCN Status: ENDANGERED (EN)"
 
 function buildUI() {
     initUISystem();
@@ -190,38 +202,39 @@ function buildUI() {
     uiButtonAbout.onClick = () => setGameState(GameState.ABOUT)
     uiButtonHighScores.onClick = () => setGameState(GameState.HIGHSCORE)
 
-    uiCreditsScreen    = buildScreen('Credits', GameState.CREDITS, creditsTextLeft, creditsTextRight)
-    uiHighScoresScreen = buildScreen('High Scores', GameState.HIGHSCORE, "50\n40\n30")
-    uiAboutScreen = buildScreen('About Pallas', GameState.ABOUT, aboutText)
+    uiCreditsScreen    = buildScreen('Credits', GameState.CREDITS, creditsTextLeft, creditsTextRight);
+    uiHighScoresScreen = buildScreen('High Scores', GameState.HIGHSCORE, "50\n40\n30");
+    uiAboutScreen = buildScreen('About Pallas', GameState.ABOUT, aboutText);
     uiWinScreen = buildScreen('A winner is you!', GameState.WIN, undefined, undefined, GameState.INITLEVEL, "Next Level")
 }
 
 function buildScreen(text, gameState, content, content2, nextGameState=GameState.STARTMENU, buttonText = "Ok") {
-  const centerX = mainCanvasSize.x / 2.0
   const half = mainCanvasSize.scale(0.5)
+  const icons = gameState == GameState.ABOUT
 
-  //const uiScreen   = new UIObject(mainCanvasSize.scale(0.5), vec2(mainCanvasSize.x/2,10), vec2(200,100));
   const uiScreen = new UIObject(half, half)
-  //uiScreen.textColor = WHITE;
-  //uiScreen.lineWidth = 8;
-  //uiScreen.visible = false
 
   //const background = new UIObject(vec2(0,mainCanvasSize.y/2), vec2(800,300))
   const uiTitle = new UIText(vec2(0, -200), vec2(1000, 70), text);
   uiScreen.addChild(uiTitle)
 
-  if (content2) {
+  if (icons) {
+    const textX = -220
+    const iconX = -350
+    uiScreen.addChild(new UIText(vec2(textX, -130), vec2(800, 22), content, 'left'));
+    uiScreen.addChild(new UITile(vec2(iconX,-80), SIZE_ICON, spriteAtlas['icon_pallas']));
+    uiScreen.addChild(new UITile(vec2(iconX, 90), SIZE_ICON, spriteAtlas['icon_mouse']));
+  } else if (content2) {
     uiScreen.addChild(new UIText(vec2(-20, -100), vec2(300, 50), content, 'right'));
     uiScreen.addChild(new UIText(vec2( 20, -100), vec2(300, 50), content2, 'left'));
   } else if (content) {
-    uiScreen.addChild(new UIText(vec2(0, -100), vec2(800, 30), content));
+    uiScreen.addChild(new UIText(vec2(-400, -100), vec2(800, 25), content, 'left'));
   }
+
 
   const okButton = new UIButton(vec2(0, 200), vec2(400, 40), buttonText, GameState.STARTMENU)
   okButton.onClick = () => setGameState(nextGameState)
   uiScreen.addChild(okButton)
-
-  //uiScreen.addChild(background)
 
   return uiScreen
 }
