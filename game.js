@@ -140,7 +140,7 @@ function gameInit()
     buildUI()
 
     if (enableMusic)
-      playAudioFile('music/game jam song fuller.mp3', 1, true)
+      playAudioFile('music/game jam song final.mp3', 1, true)
 
     setGameState(debugGameState ? debugGameState : enableStartMenu ? GameState.STARTMENU : GameState.PLAYING )
 }
