@@ -32,6 +32,8 @@ const IMAGE_UI_BUTTONS = 13
 const IMAGE_LOGOCAT = 14
 const IMAGE_ICONS = 15
 
+//const buttonClick = new SoundWave('sound.mp3');
+
 const IMAGES = [
   'tiles2.png',
   'tilesLevel.png',
@@ -60,6 +62,8 @@ const INDEX_HD1 = 2
 const STARTING_WARMTH = 20
 
 window.alpha = 1
+
+const sound_click = new Sound([1,0]);
 
 // enable touch gamepad on touch devices
 touchGamepadEnable = true;
@@ -203,15 +207,20 @@ function buildUI() {
     uiStartMenuBackground.addChild(uiButtonHighScores);
     uiStartMenuBackground.addChild(uiLogocat);
 
-    uiButtonPlay.onClick = () => setGameState(GameState.PLAYING)
-    uiButtonCredits.onClick = () => setGameState(GameState.CREDITS)
-    uiButtonAbout.onClick = () => setGameState(GameState.ABOUT)
-    uiButtonHighScores.onClick = () => setGameState(GameState.HIGHSCORE)
+    uiButtonPlay.onClick = () => clickOk(GameState.PLAYING)
+    uiButtonCredits.onClick = () => clickOk(GameState.CREDITS)
+    uiButtonAbout.onClick = () => clickOk(GameState.ABOUT)
+    uiButtonHighScores.onClick = () => clickOk(GameState.HIGHSCORE)
 
     uiCreditsScreen    = buildScreen('Credits', GameState.CREDITS, creditsTextLeft, creditsTextRight);
     uiHighScoresScreen = buildScreen('High Scores', GameState.HIGHSCORE, "50\n40\n30");
     uiAboutScreen = buildScreen('About Pallas', GameState.ABOUT, aboutText);
     uiWinScreen = buildScreen('A winner is you!', GameState.WIN, undefined, undefined, GameState.INITLEVEL, "Next Level")
+}
+
+function clickOk(gameState) {
+  sound_click.play();
+  setGameState(gameState);
 }
 
 function buildScreen(text, gameState, content, content2, nextGameState=GameState.STARTMENU, buttonText = "Ok") {
@@ -241,7 +250,7 @@ function buildScreen(text, gameState, content, content2, nextGameState=GameState
 
 
   const okButton = new UIButton(vec2(0, 200), vec2(400, 40), buttonText, GameState.STARTMENU)
-  okButton.onClick = () => setGameState(nextGameState)
+  okButton.onClick = () => clickOk(nextGameState)
   uiScreen.addChild(okButton)
 
   return uiScreen
