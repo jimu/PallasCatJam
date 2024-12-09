@@ -36,6 +36,9 @@ class Character extends GameObject
     {
         this.gravityScale = 1; // reset to default gravity
 
+        if (!this.isDead() && warmthTimer.get() > 0)
+          this.kill();
+
         if (this.isDead())
             return super.update();
 
@@ -214,7 +217,7 @@ class Character extends GameObject
     render()
     {
         // update animation
-        const animationFrame = this.isDead() ? 0 :
+        const animationFrame = this.isDead() ? (this.deadTimer.get() < 0.5 ? 4 : 5) :
             this.climbingLadder || this.groundTimer.active() ?
             2 * this.walkCyclePercent|0 :
             this.jumpTimer.get() % 0.3 > 0.15 ? 2 : 3;
@@ -253,8 +256,10 @@ class Character extends GameObject
         this.deadTimer.set();
         this.size = this.size.scale(.5);
         const fallDirection = damagingObject ? sign(damagingObject.velocity.x) : randSign();
+        /*
         this.angleVelocity = fallDirection*rand(.22,.14);
         this.angleDamping = .9;
+        */
         this.renderOrder = -1;  // move to back layer
     }
     

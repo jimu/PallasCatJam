@@ -8,11 +8,11 @@
 
 'use strict';
 
-const enableMusic = true
-const enableStartMenu = true
+const enableMusic = true;
+const enableStartMenu = true;
 const enableBackground = true;
 const TESTAPP = 0;
-const debugGameState = false; // GameState.CREDITS
+const debugGameState = undefined; //  GameState.PLAYING
 
 const w = window
 
@@ -96,17 +96,17 @@ function gameInit()
       circle:  tile(0),
       crate:   tile(2),
       player:  tile(1, vec2(128)),
-      fox:     tile(6, vec2(128)),
+      fox:     tile(vec2(1,1), vec2(128)),
       enemy:   tile(5),
-      coin:    tile(20, vec2(64)),
+      coin:    tile(vec2(0,2), vec2(64)),
 
       // small tiles
       gun:     tile(2,8),
       grenade: tile(3,8),
 
       //ham:     tile(3, vec2(64)),
-      ham:     tile(20, vec2(64)),
-      berries: tile(21, vec2(64)),
+      ham:     tile(vec2(0,2), vec2(64)),
+      berries: tile(vec2(1,2), vec2(64)),
 
       flowers1: tile(0, vec2(128), IMAGE_FLOWERS),
       flowers2: tile(1, vec2(128), IMAGE_FLOWERS),
@@ -152,8 +152,14 @@ function scaleToFit(containerSize, containedSize) {
   return Math.min(scale, 1.0)
 }
 
+// Credits
+// Our Team
+// Jim – The programmer who brought everything together, handling all the technical aspects of the game.
+// Polina – The artist responsible for all the visuals, including backgrounds, characters, and animations.
+// Jasmine – The composer who created all the music and sound effects in the game.
+//
 const creditsTextLeft = "Programming\nArt\nMusic\n\nPhotography"
-const creditsTextRight = "Alpha Beta [link]\nBeta Delta [link]\nEpsilon Theta [link]\n\nWikimedia Commons [link]"
+const creditsTextRight = "Jim [link]\nPolina [link]\nJasmine [link]\n\nWikimedia Commons [link]"
 const aboutText = 
   "The Pallas's cat (Otocolobus manul)\n" +
   "\n"+
@@ -255,6 +261,9 @@ function gameUpdate()
           player = new Player(playerStartPos);
           player.velocity = vec2(0,.1);
           sound_jump.play();
+
+          savedWarmthTimer = STARTING_WARMTH
+          warmthTimer.set(savedWarmthTimer)
       }
 
       // mouse wheel = zoom
