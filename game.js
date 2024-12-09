@@ -11,8 +11,8 @@
 const enableMusic = true
 const enableStartMenu = true
 const enableBackground = true;
-const TESTAPP = 0
-const debugGameState = GameState.ABOUT
+const TESTAPP = 0;
+const debugGameState = false; // GameState.CREDITS
 
 const w = window
 
@@ -152,8 +152,8 @@ function scaleToFit(containerSize, containedSize) {
   return Math.min(scale, 1.0)
 }
 
-const creditsTextLeft = "dev\nart\nmusic"
-const creditsTextRight = "alpha\nbeta\ndelta"
+const creditsTextLeft = "Programming\nArt\nMusic\n\nPhotography"
+const creditsTextRight = "Alpha Beta [link]\nBeta Delta [link]\nEpsilon Theta [link]\n\nWikimedia Commons [link]"
 const aboutText = 
   "The Pallas's cat (Otocolobus manul)\n" +
   "\n"+
@@ -222,11 +222,13 @@ function buildScreen(text, gameState, content, content2, nextGameState=GameState
     const textX = -220
     const iconX = -350
     uiScreen.addChild(new UIText(vec2(textX, -130), vec2(800, 22), content, 'left'));
-    uiScreen.addChild(new UITile(vec2(iconX,-80), SIZE_ICON, spriteAtlas['icon_pallas']));
+    uiScreen.addChild(new UITile(vec2(iconX,-80), SIZE_ICON, spriteAtlas['icon_pallas']));  // https://en.wikipedia.org/wiki/Pallas%27s_cat
     uiScreen.addChild(new UITile(vec2(iconX, 90), SIZE_ICON, spriteAtlas['icon_mouse']));
+    uiScreen.addChild(new UIText(vec2(textX, -130), vec2(800, 22), content, 'left'));
   } else if (content2) {
-    uiScreen.addChild(new UIText(vec2(-20, -100), vec2(300, 50), content, 'right'));
-    uiScreen.addChild(new UIText(vec2( 20, -100), vec2(300, 50), content2, 'left'));
+    const x = -80
+    uiScreen.addChild(new UIText(vec2(x - 20, -100), vec2(600, 40), content, 'right'));
+    uiScreen.addChild(new UIText(vec2(x + 20, -100), vec2(600, 40), content2, 'left'));
   } else if (content) {
     uiScreen.addChild(new UIText(vec2(-400, -100), vec2(800, 25), content, 'left'));
   }
