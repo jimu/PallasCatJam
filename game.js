@@ -163,7 +163,7 @@ function scaleToFit(containerSize, containedSize) {
 // Jasmine – The composer who created all the music and sound effects in the game.
 //
 const creditsTextLeft = "Programming\nArt\nMusic\n\nPhotography"
-const creditsTextRight = "Jim [link]\nPolina [link]\nJasmine [link]\n\nWikimedia Commons [link]"
+const creditsTextRight = "Jim\nPolina\nJasmine\n\nWikimedia Commons"
 const aboutText = 
   "The Pallas's cat (Otocolobus manul)\n" +
   "\n"+
