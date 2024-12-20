@@ -111,6 +111,7 @@ class Coin extends EngineObject
         // award points and destroy
         ++score;
         sound_score.play(this.pos);
+        warmthTimer.set(-warmthTimer.get() + 2);
         this.destroy();
     }
 }

@@ -59,7 +59,7 @@ const SIZE_LOGOCAT = vec2(1071, 836);
 const SIZE_CAVE = vec2(192, 128);
 const SIZE_ICON = vec2(200, 150);
 const INDEX_HD1 = 2
-const STARTING_WARMTH = 20
+const STARTING_WARMTH = 12
 
 window.alpha = 1
 
